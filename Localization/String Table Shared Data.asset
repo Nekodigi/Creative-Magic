@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: String Table Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: String Table
+  m_TableCollectionNameGuidString: ba33eb9501954ed48ae7ad0ee31fb8eb
+  m_Entries:
+  - m_Id: 878943789056
+    m_Key: AboutUs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 539955945472
+    m_Key: Color
+    m_Metadata:
+      m_Items: []
+  - m_Id: 801349165056
+    m_Key: Info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 594091827200
+    m_Key: Range
+    m_Metadata:
+      m_Items: []
+  - m_Id: 184295743488
+    m_Key: 'Scale
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 336645447680
+    m_Key: Speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 332778299392
+    m_Key: Trans
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2306307383296
+    m_Key: Blog
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16480504766464
+    m_Key: 'Close
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17098027950080
+    m_Key: Screenshot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19732046667776
+    m_Key: Capture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19756574957568
+    m_Key: Reset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 72096971612160
+    m_Key: Lang
+    m_Metadata:
+      m_Items: []
+  - m_Id: 83204868530176
+    m_Key: BlogURL
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    id: 0
+  references:
+    version: 1
+    00000000:
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1631493845536

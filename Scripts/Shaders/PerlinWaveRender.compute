@@ -1,0 +1,76 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#pragma kernel Particles
+#include "../SimplexNoise.cginc"
+
+
+//perlin noise https://www.reddit.com/r/Unity3D/comments/756odp/is_it_possible_to_use_anything_similar_to/
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+float time;
+float deltaTime;
+float speedMult;//not used
+float scaleMult;
+float height;
+float width;
+float2 touchPos;
+struct Particle {
+    float2 pos;
+    float speed;//use as flag
+    float4 color;
+};/*struct Particle {
+    float y;
+};*/
+RWStructuredBuffer<Particle> particles;
+//Particle particles[10000];
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    //Result[id.xy] = Source[id.xy];
+    float fac = 1.0 - deltaTime * 0.5;
+    Result[id.xy] = Result[id.xy] * fac + float4(0, 0, 0, 0)*(1-fac);// float4(snoise(float2(id.xy / 50.0), 10) * 0.5 + 0.5, 0, 0, 0)* (1 - fac);
+    //Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    //snoise(float2(0, 1));
+    //Result[id.xy] = float4(1, 0, 0, 0);
+}
+
+[numthreads(100, 1, 1)]
+void Particles(uint3 id : SV_DispatchThreadID)
+{
+    scaleMult *= 2;
+    // TODO: insert actual code here!
+    //Result[id.xy] = Source[id.xy];
+    //Particle particle = particles[id.x].y;
+    //Result[id.x] = float4(1, 0, 0, 0);
+    //Result[id.xy] = float4(snoise(float2(id.xy / 50.0), 10) * 0.5 + 0.5, 0, 0, 0);
+    //Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    //snoise(float2(0, 1));
+    //particles[id.x].y[0];
+
+    //particle.y[0] = snoise(float2(id.xy/30.0), 10)*100;
+    //Particle particle;
+    //particles[0] = particle;
+    
+    float fac = 0;
+    Particle p = particles[id.x];
+    float py = p.pos.y;
+    float x = p.pos.x;
+    if (p.speed == 1) {
+         py = py-(snoise(float2(x / (300.0 * scaleMult), time / 8.0), 10) * 200 + sin((abs(x/* - touchPos.x*/) - time * 2.5 * speedMult) / (100.0 * scaleMult)) * 200);// + sin((abs(x/* - touchPos.x*/) - time * 400.0) / (100.0 * scaleMult)) * 200)
+         particles[id.x].pos = float2(p.pos.x, py);
+         particles[id.x].speed = 0;
+    }
+    
+    py = particles[id.x].pos.y;
+    //if (id.y == 0) {//snoise(float2(x / (300.0*scaleMult), time/2.0 + 0 / 1000.0f), 10) * 200 + sin((abs(x- touchPos.x )-time*400.0) / (100.0 * scaleMult)) * 200+
+        float y = snoise(float2(x / (300.0 * scaleMult), time / 8.0), 10) * 200 + sin((abs(x/* - touchPos.x*/) - time * 2.50 * speedMult) / (100.0 * scaleMult)) * 200 + py;//
+    //}
+    
+    Result[float2(x , y) ] = Result[float2(x, y)] * fac + p.color * (1 - fac);
+    
+}
+
+//float y = snoise(float2(x, time), 10) * 200 + sin((x - time)) + py;

@@ -1,0 +1,103 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#pragma kernel Particles
+#include "../SimplexNoise.cginc"
+#include "../HsvRgb.cginc"
+//perlin noise https://www.reddit.com/r/Unity3D/comments/756odp/is_it_possible_to_use_anything_similar_to/
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+float time;
+float deltaTime;//0.01~1
+float speedMult;//0.1~10
+float scaleMult;//0.1~10
+float height;
+float width;
+float2 touchPos;
+
+struct Particle {
+    float2 pos;
+    float speed;
+    float4 color;
+};
+
+RWStructuredBuffer<Particle> particles;
+//Particle particles[10000];
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    //Result[id.xy] = Source[id.xy];
+    float fac = 1.0-deltaTime*0.5;//shold be variable and 1-fac*deltaTime
+    Result[id.xy] = Result[id.xy] * fac + float4(0, 0, 0, 0)*(1-fac);// float4(snoise(float2(id.xy / 50.0), 10) * 0.5 + 0.5, 0, 0, 0)* (1 - fac);
+    //Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    //snoise(float2(0, 1));
+    //Result[id.xy] = float4(1, 0, 0, 0);
+}
+
+[numthreads(100, 1, 1)]
+void Particles(uint3 id : SV_DispatchThreadID)
+{
+    scaleMult *= 2;
+    // TODO: insert actual code here!
+    //Result[id.xy] = Source[id.xy];
+    //Particle particle = particles[id.x].y;
+    //Result[id.x] = float4(1, 0, 0, 0);
+    //Result[id.xy] = float4(snoise(float2(id.xy / 50.0), 10) * 0.5 + 0.5, 0, 0, 0);
+    //Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    //snoise(float2(0, 1));
+    //particles[id.x].y[0];
+    //Particle particle = particles[id.x * 100 + id.y];
+    //particle.y[0] = snoise(float2(id.xy/30.0), 10)*100;
+    //Particle particle;
+    //particles[0] = particle;
+    
+
+    float4 after = float4(0, 0, 0, 0);
+    float fac = 0;
+    //Particle particle = particles[id.x];
+    Particle p = particles[id.x];//!!!don't have reference
+    if (p.speed == 0)particles[id.x].speed = 1;
+    float angle = snoise(float3(p.pos.xy / (500.0*scaleMult), time/20), 10) * 10.0;
+    float2 dir = float2(cos(angle), sin(angle));
+    float finalSpeed = p.speed * speedMult * deltaTime;
+
+    Result[floor(p.pos + dir * finalSpeed * 0.25)] = p.color;
+    Result[floor(p.pos + dir * finalSpeed * 0.5)] = p.color;
+    Result[floor(p.pos + dir * finalSpeed * 0.75)] = p.color;
+
+    particles[id.x].pos += dir*finalSpeed;
+
+    if (p.pos.x < 0 || p.pos.x > width || p.pos.y < 0 || p.pos.y > height) {
+        float fac=0.01;
+        particles[id.x].pos = float2(p.pos.x*(1-fac)+width/2*fac, p.pos.y*(1-fac)+height/2*fac);
+        particles[id.x].speed = -p.speed;
+    }
+    
+    if (touchPos.x != -1) {
+        //float2 diff = particles[id.x].pos - touchPos;
+        //float sqDist = diff.x * diff.x + diff.y * diff.y;
+        //particles[id.x].pos += normalize(diff) / sqrt(sqDist) * 50;
+        //particles[id.x].pos += float2(1, 0);
+        //Result[p.pos] = float4(hsvRgb(float3((time / 60.0) % 0.33 + 0.33, (time / 2.0) % 1 + 0, (time / 4.0) % 0.4 + 0.6)), 0);
+    }
+    int2 pid = floor(p.pos);
+    Result[pid] = p.color;
+
+    //Result[float2(id.x, 100)] = float4(1, 0, 0, 0);
+    //Result[float2(100, 100)] = float4(1, 1, 1, 0);
+    //float py = particles[id.x * 1 + id.y].y;
+    //for (int i = 0; i < 4; i++) {
+        //for (int j = 0; j < 4; j++) {
+
+            //float4 before = Result[float2(id.x , py)];
+            //Result[float2(id.x , py + height/2) ] =  before* fac + after * (1 - fac);
+        //}
+    //}
+}
+
+/*float angle = snoise(float3(p.pos.xy), time), 10) * 10.0;
+float2 dir = float2(cos(angle), sin(angle));
+particles[id.x].pos += dir * speed;*/

@@ -1,0 +1,96 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#pragma kernel Black
+#pragma kernel Particles
+#include "../SimplexNoise.cginc"
+//perlin noise https://www.reddit.com/r/Unity3D/comments/756odp/is_it_possible_to_use_anything_similar_to/
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+float time;
+float deltaTime;
+float speedMult;
+float scaleMult;//0.1~10
+float height;
+float width;
+
+
+struct Particle {
+    float2 pos;
+    float speed;//use as enable
+    float4 color;
+};
+
+RWStructuredBuffer<Particle> particles;
+//Particle particles[10000];
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+}
+
+[numthreads(8, 8, 1)]
+void Black(uint3 id : SV_DispatchThreadID)
+{
+    Result[id.xy] = float4(0, 0, 0, 0);
+}
+
+[numthreads(100, 1, 1)]
+void Particles(uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    //Result[id.xy] = Source[id.xy];
+    //Particle particle = particles[id.x].y;
+    //Result[id.x] = float4(1, 0, 0, 0);
+    //Result[id.xy] = float4(snoise(float2(id.xy / 50.0), 10) * 0.5 + 0.5, 0, 0, 0);
+    //Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    //snoise(float2(0, 1));
+    //particles[id.x].y[0];
+    //Particle particle = particles[id.x * 100 + id.y];
+    //particle.y[0] = snoise(float2(id.xy/30.0), 10)*100;
+    //Particle particle;
+    //particles[0] = particle;
+    float4 after = float4(0, 0, 0, 0);
+    float fac = 0;
+    //Particle particle = particles[id.x];
+    Particle p = particles[id.x];//!!!don't have reference
+    
+
+    if (p.speed ==1) {
+        float angle = snoise(float3(p.pos.xy / (500.0 * scaleMult), time/10), 10) * 10.0;
+        float2 dir = float2(cos(angle), sin(angle));
+        float finalSpeed = p.speed * speedMult * deltaTime;
+        particles[id.x].pos += dir * finalSpeed;
+
+        if (p.pos.x < 0 || p.pos.x > width || p.pos.y < 0 || p.pos.y > height) {
+            float fac = 0.01;
+            particles[id.x].pos = float2(p.pos.x * (1 - fac) + width / 2 * fac, p.pos.y * (1 - fac) + height / 2 * fac);
+            //particles[id.x].speed = -p.speed;
+        }
+
+        p = particles[id.x];
+        int2 pid = floor(p.pos);
+        if (Result[pid].x == 0) particles[id.x].speed = 0;
+        float2 pxy = frac(p.pos);
+        float4 col = float4(1, 1, 1, 0);
+        Result[pid] = p.color;
+        Result[pid+float2(1, 0)] = p.color;
+        Result[pid + float2(-1, 0)] = p.color;
+        Result[pid + float2(0, 1)] = p.color;
+        Result[pid + float2(0, -1)] = p.color;
+    }
+    //Result[float2(id.x, 100)] = float4(1, 0, 0, 0);
+    //Result[float2(100, 100)] = float4(1, 1, 1, 0);
+    //float py = particles[id.x * 1 + id.y].y;
+    //for (int i = 0; i < 4; i++) {
+        //for (int j = 0; j < 4; j++) {
+
+            //float4 before = Result[float2(id.x , py)];
+            //Result[float2(id.x , py + height/2) ] =  before* fac + after * (1 - fac);
+        //}
+    //}
+}
+
+//if (Result[pid].x == 0) particles[id.x].speed = 0;
+//Result[pid] = p.color;

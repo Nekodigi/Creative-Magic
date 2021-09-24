@@ -1,0 +1,14 @@
+{
+  "items":[
+    {"key":"Scale","value":"大きさ"},
+    {"key":"Speed","value":"速さ"},
+    {"key":"Trans","value":"変化"},
+    {"key":"Color","value":"色"},
+    {"key":"Range","value":"範囲"},
+    {"key":"Close","value":"閉じる"},
+    {"key":"Reset","value":"リセット"},
+    {"key":"Photo","value":"撮影"},
+    {"key":"Info","value":"情報"},
+    {"key":"AboutUs","value":"癒しと想像力を与えてくれる動画を作っています。コメントや挨拶、大歓迎です！"},
+  ]
+}
